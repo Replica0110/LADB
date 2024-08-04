@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageButton
+import android.widget.PopupMenu
 import android.widget.TextView
 import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.RecyclerView
@@ -21,8 +22,7 @@ class BookmarksRecyclerAdapter(context: Context) : RecyclerView.Adapter<Bookmark
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val content: TextView = view.findViewById(R.id.content)
-        val delete: ImageButton = view.findViewById(R.id.delete)
-        val edit: ImageButton = view.findViewById(R.id.edit)
+        val options: ImageButton = view.findViewById(R.id.overflow_menu)
     }
 
     @SuppressLint("NotifyDataSetChanged")
@@ -73,8 +73,26 @@ class BookmarksRecyclerAdapter(context: Context) : RecyclerView.Adapter<Bookmark
         val text = list.elementAt(position)
         holder.content.text = text
         holder.itemView.setOnClickListener { pickHook(text) }
-        holder.delete.setOnClickListener { deleteHook(text) }
-        holder.edit.setOnClickListener { editHook(text) }
+
+        // Set up the overflow menu
+        holder.options.setOnClickListener { view ->
+            val popup = PopupMenu(view.context, view)
+            popup.inflate(R.menu.menu_overflow) // Inflate the overflow menu layout
+            popup.setOnMenuItemClickListener { item ->
+                when (item.itemId) {
+                    R.id.action_edit -> {
+                        editHook(text)
+                        true
+                    }
+                    R.id.action_delete -> {
+                        deleteHook(text)
+                        true
+                    }
+                    else -> false
+                }
+            }
+            popup.show()
+        }
     }
 
     override fun getItemCount() = list.size

@@ -9,9 +9,9 @@
             android:title="@string/unpair_title" />
         <Preference
             android:icon="@drawable/ic_baseline_settings_backup_restore_24"
-            android:key="@string/restart_key"
-            android:summary="@string/restart_summary"
-            android:title="@string/restart_title" />
+            android:key="@string/reset_key"
+            android:summary="@string/reset_summary"
+            android:title="@string/reset_title" />
         <SwitchPreference
             android:defaultValue="true"
             android:icon="@drawable/ic_baseline_home_repair_service_24"
@@ -31,27 +31,18 @@
             android:summary="@string/startup_command_summary"
             android:title="@string/startup_command_title" />
     </PreferenceCategory>
-    <PreferenceCategory android:title="@string/troubleshooting">
-        <Preference
-            android:icon="@drawable/ic_baseline_checklist_24"
-            android:key="@string/tutorial_key"
-            android:summary="@string/tutorial_summary"
-            android:title="@string/tutorial_title" />
-        <Preference
-            android:icon="@drawable/ic_baseline_error_24"
-            android:title="@string/error_waiting_title"
-            app:summary="@string/error_waiting_summary" />
-        <Preference
-            android:icon="@drawable/ic_baseline_error_24"
-            android:summary="@string/error_no_wireless_debugging_summary"
-            android:title="@string/error_no_wireless_debugging_title" />
-    </PreferenceCategory>
+
     <PreferenceCategory android:title="@string/about">
         <Preference
             android:icon="@drawable/ic_baseline_person_24"
             android:key="@string/developer_key"
             android:summary="@string/developer_summary"
             android:title="@string/developer_title" />
+        <Preference
+            android:icon="@drawable/ic_baseline_translation_24"
+            android:key="@string/translation_key"
+            android:summary="@string/translation_summary"
+            android:title="@string/translation_title" />
         <Preference
             android:icon="@drawable/ic_baseline_code_24"
             android:key="@string/source_key"
