@@ -22,6 +22,7 @@ import androidx.preference.PreferenceManager
 import com.draco.ladb.BuildConfig
 import com.draco.ladb.R
 import com.draco.ladb.databinding.ActivityMainBinding
+import com.draco.ladb.recyclers.HistoryRecyclerAdapter
 import com.draco.ladb.viewmodels.MainActivityViewModel
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
@@ -33,12 +34,16 @@ import kotlin.system.exitProcess
 class MainActivity : AppCompatActivity() {
     private val viewModel: MainActivityViewModel by viewModels()
     private lateinit var binding: ActivityMainBinding
+    private lateinit var historyAdapter: HistoryRecyclerAdapter
 
     private lateinit var pairDialog: MaterialAlertDialogBuilder
 
-    private var lastCommand = ""
 
     private var bookmarkGetResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
+        val text = it.data?.getStringExtra(Intent.EXTRA_TEXT) ?: return@registerForActivityResult
+        binding.command.setText(text)
+    }
+    private var historyGetResult = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) {
         val text = it.data?.getStringExtra(Intent.EXTRA_TEXT) ?: return@registerForActivityResult
         binding.command.setText(text)
     }
@@ -73,10 +78,11 @@ class MainActivity : AppCompatActivity() {
 
     private fun sendCommandToADB() {
         val text = binding.command.text.toString()
-        lastCommand = text
         binding.command.text = null
         lifecycleScope.launch(Dispatchers.IO) {
             viewModel.adb.sendToShellProcess(text)
+            historyAdapter.updateList()
+            historyAdapter.add(text)
         }
     }
 
@@ -88,7 +94,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupDataListeners() {
-        /* Update the output text */
         viewModel.outputText.observe(this) { newText ->
             binding.output.text = newText
             binding.outputScrollview.post {
@@ -99,7 +104,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        /* Restart the activity on reset */
         viewModel.adb.closed.observe(this) { closed ->
             if (closed == true) {
                 val intent = Intent(this, MainActivity::class.java)
@@ -109,7 +113,6 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        /* Prepare progress bar, pairing latch, and script executing */
         viewModel.adb.started.observe(this) { started ->
             setReadyForInput(started == true)
         }
@@ -123,7 +126,6 @@ class MainActivity : AppCompatActivity() {
                     viewModel.setPairedBefore(true)
                     viewModel.startADBServer()
                 } else {
-                    /* Failed; try again! */
                     viewModel.adb.debug("Failed to pair! Trying again...")
                     runOnUiThread { pairAndStart() }
                 }
@@ -138,59 +140,52 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        historyAdapter = HistoryRecyclerAdapter(this)
+
         setupUI()
         setupDataListeners()
         if (viewModel.isPairing.value != true)
             pairAndStart()
-
-//        viewModel.piracyCheck(this)
     }
 
-    /**
-     * Ask the user to pair
-     */
     private fun askToPair(callback: ((Boolean) -> (Unit))? = null) {
-        pairDialog
-            .create()
-            .apply {
-                setOnShowListener {
-                    getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
-                        val port = findViewById<TextInputEditText>(R.id.port)!!.text.toString()
-                        val code = findViewById<TextInputEditText>(R.id.code)!!.text.toString()
-                        dismiss()
+        pairDialog.create().apply {
+            setOnShowListener {
+                getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener {
+                    val port = findViewById<TextInputEditText>(R.id.port)!!.text.toString()
+                    val code = findViewById<TextInputEditText>(R.id.code)!!.text.toString()
+                    dismiss()
 
-                        lifecycleScope.launch(Dispatchers.IO) {
-                            viewModel.adb.debug("Trying to pair...")
-                            val success = viewModel.adb.pair(port, code)
-                            callback?.invoke(success)
-                        }
-                    }
-
-                    getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener {
-                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.tutorial_url)))
-                        try {
-                            startActivity(intent)
-                        } catch (e: Exception) {
-                            e.printStackTrace()
-                            Snackbar.make(
-                                binding.output,
-                                getString(R.string.snackbar_intent_failed),
-                                Snackbar.LENGTH_SHORT
-                            )
-                                .show()
-                        }
-                    }
-
-                    getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener {
-                        PreferenceManager.getDefaultSharedPreferences(context).edit(true) {
-                            putBoolean(getString(R.string.auto_shell_key), false)
-                        }
-                        dismiss()
-                        callback?.invoke(true)
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        viewModel.adb.debug("Trying to pair...")
+                        val success = viewModel.adb.pair(port, code)
+                        callback?.invoke(success)
                     }
                 }
+
+                getButton(AlertDialog.BUTTON_NEGATIVE).setOnClickListener {
+                    val intent = Intent(Intent.ACTION_VIEW, Uri.parse(getString(R.string.tutorial_url)))
+                    try {
+                        startActivity(intent)
+                    } catch (e: Exception) {
+                        e.printStackTrace()
+                        Snackbar.make(
+                            binding.output,
+                            getString(R.string.snackbar_intent_failed),
+                            Snackbar.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+
+                getButton(AlertDialog.BUTTON_NEUTRAL).setOnClickListener {
+                    PreferenceManager.getDefaultSharedPreferences(context).edit(true) {
+                        putBoolean(getString(R.string.auto_shell_key), false)
+                    }
+                    dismiss()
+                    callback?.invoke(true)
+                }
             }
-            .show()
+        }.show()
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -202,9 +197,10 @@ class MainActivity : AppCompatActivity() {
                 true
             }
 
-            R.id.last_command -> {
-                binding.command.setText(lastCommand)
-                binding.command.setSelection(lastCommand.length)
+            R.id.shell_history -> {
+                val intent = Intent(this, HistoryActivity::class.java)
+                    .putExtra(Intent.EXTRA_TEXT, binding.command.text.toString())
+                historyGetResult.launch(intent)
                 true
             }
 

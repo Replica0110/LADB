@@ -4,7 +4,7 @@
     <string name="command_hint">shell指令</string>
     <string name="command_hint_waiting">正在连接…</string>
     <string name="bookmarks">书签</string>
-    <string name="last_command">最近的命令</string>
+    <string name="shell_history">最近的命令</string>
     <string name="help">帮助</string>
     <string name="more">帮助</string>
     <string name="share">分享</string>
@@ -63,5 +63,7 @@
     <string name="translation_title">翻译</string>
     <string name="translation_key">翻译</string>
     <string name="command_send">发送</string>
-    <string name="more_options">more options</string>
+    <string name="more_options">更多选项</string>
+    <string name="history">历史记录</string>
+    <string name="clear_confirm">是否确认清空所有历史记录?</string>
 </resources>

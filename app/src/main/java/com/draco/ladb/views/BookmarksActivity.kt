@@ -23,7 +23,7 @@ class BookmarksActivity: AppCompatActivity() {
 
         initialText = intent.getStringExtra(Intent.EXTRA_TEXT) ?: ""
 
-        viewModel.prepareRecycler(this, binding.recycler)
+        viewModel.prepareRecycler(this, binding.bookmarkRecycler)
         viewModel.recyclerAdapter.pickHook = {
             val intent = Intent()
                 .putExtra(Intent.EXTRA_TEXT, it)

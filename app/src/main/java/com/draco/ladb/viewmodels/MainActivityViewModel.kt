@@ -89,7 +89,7 @@ class MainActivityViewModel(application: Application) : AndroidViewModel(applica
     }
 
     /**
-     * Read the content of the ABD output file
+     * Read the content of the ADB output file
      */
     private fun readOutputFile(file: File): String {
         val out = ByteArray(adb.getOutputBufferSize())

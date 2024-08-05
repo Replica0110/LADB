@@ -21,7 +21,7 @@ class BookmarksRecyclerAdapter(context: Context) : RecyclerView.Adapter<Bookmark
     var editHook: (String) -> Unit = {}
 
     class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        val content: TextView = view.findViewById(R.id.content)
+        val content: TextView = view.findViewById(R.id.bookmark_content)
         val options: ImageButton = view.findViewById(R.id.overflow_menu)
     }
 
@@ -65,7 +65,7 @@ class BookmarksRecyclerAdapter(context: Context) : RecyclerView.Adapter<Bookmark
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         updateList(false)
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.recycler_item, parent, false)
+            .inflate(R.layout.bookmark_item, parent, false)
         return ViewHolder(view)
     }
 

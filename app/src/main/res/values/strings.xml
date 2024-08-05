@@ -5,7 +5,7 @@
     <string name="command_hint_waiting">Waiting for connection…</string>
 
     <string name="bookmarks">Bookmarks</string>
-    <string name="last_command">Last command</string>
+    <string name="shell_history">command history</string>
     <string name="help">Help</string>
     <string name="more">More</string>
     <string name="share">Share</string>
@@ -89,4 +89,6 @@
     <string name="translation_url" translatable="false">https://github.com/Agiens02</string>
     <string name="command_send">send</string>
     <string name="more_options">more_options</string>
+    <string name="history">shell history</string>
+    <string name="clear_confirm">Are you sure you want to clear all history?</string>
 </resources>

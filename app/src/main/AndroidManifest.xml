@@ -39,7 +39,7 @@
         <activity
             android:name=".views.BookmarksActivity"
             android:label="@string/bookmarks" />
-
+        <activity android:name=".views.HistoryActivity" android:label="@string/history" />
         <service
             android:name=".services.QSTile"
             android:exported="true"

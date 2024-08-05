@@ -6,8 +6,19 @@
     </style>
 
     <style name="BookmarkCardView">
-        <item name="android:layout_marginTop">@dimen/bookmark_card_margin</item>
-        <item name="android:layout_marginHorizontal">@dimen/bookmark_card_margin</item>
+        <item name="android:layout_marginTop">12dp</item>
+        <item name="android:layout_marginHorizontal">12dp</item>
+        <item name="android:layout_gravity">center_vertical</item>
+    </style>
+
+    <style name="History">
+        <item name="android:gravity">center</item>
+        <item name="android:paddingVertical">12dp</item>
+    </style>
+
+    <style name="HistoryCardView">
+        <item name="android:layout_marginTop">12dp</item>
+        <item name="android:layout_marginHorizontal">12dp</item>
         <item name="android:layout_gravity">center_vertical</item>
     </style>
 </resources>
