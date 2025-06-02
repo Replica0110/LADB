@@ -89,21 +89,23 @@ class ADB(private val context: Context) {
             /* Only do wireless debugging steps on compatible versions */
             if (secureSettingsGranted) {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R && !isWirelessDebuggingEnabled()) {
+                    debug("Turning on wireless debugging...")
                     Settings.Global.putInt(
                         context.contentResolver,
                         "adb_wifi_enabled",
                         1
                     )
 
-                    Thread.sleep(2_000)
+                    Thread.sleep(5_000)
                 } else if (!isUSBDebuggingEnabled()) {
+                    debug("Turning on USB debugging...")
                     Settings.Global.putInt(
                         context.contentResolver,
                         Settings.Global.ADB_ENABLED,
                         1
                     )
 
-                    Thread.sleep(2_000)
+                    Thread.sleep(5_000)
                 }
             }
 
@@ -129,7 +131,9 @@ class ADB(private val context: Context) {
             adb(false, listOf("start-server")).waitFor()
             debug("Waiting for device to connect...")
             debug("This may take a minute")
-            val waitProcess = adb(false, listOf("wait-for-device")).waitFor(1, TimeUnit.MINUTES)
+
+            val adbPort = DnsDiscover.adbPort
+            val waitProcess = adb(false, listOf("connect", "localhost:$adbPort")).waitFor(1, TimeUnit.MINUTES)
             if (!waitProcess) {
                 debug("Your device didn't connect to LADB")
                 debug("If a reboot doesn't work, please contact support")
@@ -140,12 +144,7 @@ class ADB(private val context: Context) {
         }
 
         shellProcess = if (autoShell) {
-            val argList = if (Build.SUPPORTED_ABIS[0] == "arm64-v8a")
-                listOf("-t", "1", "shell")
-            else
-                listOf("shell")
-
-            adb(true, argList)
+            adb(true, listOf("shell"))
         } else {
             shell(true, listOf("sh", "-l"))
         }
@@ -179,6 +178,34 @@ class ADB(private val context: Context) {
         Settings.Global.getInt(context.contentResolver, Settings.Global.ADB_ENABLED, 0) == 1
 
     /**
+     * Cycles wireless debugging to get a new port to scan.
+     */
+    fun cycleWirelessDebugging() {
+        val secureSettingsGranted =
+            context.checkSelfPermission(Manifest.permission.WRITE_SECURE_SETTINGS) == PackageManager.PERMISSION_GRANTED
+
+        if (secureSettingsGranted) {
+            debug("Cycling wireless debugging, please wait...")
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                Settings.Global.putInt(
+                    context.contentResolver,
+                    "adb_wifi_enabled",
+                    0
+                )
+                Thread.sleep(5_000)
+
+                debug("Turning on wireless debugging...")
+                Settings.Global.putInt(
+                    context.contentResolver,
+                    "adb_wifi_enabled",
+                    1
+                )
+                Thread.sleep(5_000)
+            }
+        }
+    }
+
+    /**
      * Wait restart the shell once it dies
      */
     fun waitForDeathAndReset() {
@@ -187,6 +214,9 @@ class ADB(private val context: Context) {
             _started.postValue(false)
             debug("Shell is dead, resetting")
             adb(false, listOf("kill-server")).waitFor()
+
+            cycleWirelessDebugging()
+
             Thread.sleep(3_000)
             initServer()
         }
