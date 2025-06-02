@@ -4,9 +4,9 @@ A local ADB shell for Android!
 
 # 下载 下载
 
-你可以在[release](https://github.com/Agiens02/LADB/tree/main/app/release)页面下载apk文件
+你可以在[release](https://github.com/Replica0110/LADB/tree/main/app/release)页面下载apk文件
 
-You can download the apk in the [release](https://github.com/Agiens02/LADB/tree/main/app/release) folder.
+You can download the apk in the [release](https://github.com/Replica0110/LADB/tree/main/app/release) folder.
 
 # How does it work?
 

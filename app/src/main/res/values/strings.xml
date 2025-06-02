@@ -84,9 +84,9 @@
     <string name="licenses_key">licenses</string>
 
     <string name="translation_key">translation</string>
-    <string name="translation_summary">Agiens02</string>
+    <string name="translation_summary">Replica0110</string>
     <string name="translation_title">Translation</string>
-    <string name="translation_url" translatable="false">https://github.com/Agiens02</string>
+    <string name="translation_url" translatable="false">https://github.com/Replica0110</string>
     <string name="command_send">send</string>
     <string name="more_options">more_options</string>
     <string name="history">shell history</string>
